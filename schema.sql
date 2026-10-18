@@ -6,6 +6,7 @@ CREATE TABLE users (
   role TEXT NOT NULL CHECK (role IN ('student', 'admin')),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+CREATE INDEX idx_attempts_user_id ON attempts(user_id);
 
 CREATE TABLE assignments (
   id SERIAL PRIMARY KEY,
@@ -15,6 +16,7 @@ CREATE TABLE assignments (
   created_by INTEGER NOT NULL REFERENCES users(id),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+CREATE INDEX idx_attempts_user_id ON attempts(user_id);
 
 CREATE TABLE attempts (
   id SERIAL PRIMARY KEY,
@@ -33,3 +35,4 @@ CREATE TABLE attempts (
   score INTEGER,
   UNIQUE (user_id, assignment_id)
 );
+CREATE INDEX idx_attempts_user_id ON attempts(user_id);

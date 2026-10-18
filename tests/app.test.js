@@ -88,3 +88,36 @@ describe('deadline rule', () => {
     expect(view.body.status).toBe('timed_out');
   });
 });
+
+describe('privacy rule', () => {
+  let otherToken;
+  let attemptId;
+
+  beforeAll(async () => {
+    adminToken = await registerAndLogin('Admin2', `admin2${run}@test.com`, 'admin');
+    studentToken = await registerAndLogin('Owner', `owner${run}@test.com`, 'student');
+    otherToken = await registerAndLogin('Other', `other${run}@test.com`, 'student');
+    attemptId = await newAttempt();
+  });
+
+  test('the owner can see their own attempt', async () => {
+    const res = await request(app)
+      .get(`/attempts/${attemptId}`)
+      .set('Authorization', `Bearer ${studentToken}`);
+    expect(res.status).toBe(200);
+  });
+
+  test('another student gets 404 for it', async () => {
+    const res = await request(app)
+      .get(`/attempts/${attemptId}`)
+      .set('Authorization', `Bearer ${otherToken}`);
+    expect(res.status).toBe(404);
+  });
+
+  test('an admin can see it', async () => {
+    const res = await request(app)
+      .get(`/attempts/${attemptId}`)
+      .set('Authorization', `Bearer ${adminToken}`);
+    expect(res.status).toBe(200);
+  });
+});
